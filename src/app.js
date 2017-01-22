@@ -6,9 +6,6 @@ var moment = require('moment')
 var cfg      = require('./cfg.js')
 var commands = require('./commands.js')
 
-const wireUrl = "http://www.amica.fi/ravintolat/ravintolat-kaupungeittain/joensuu/wire/"
-const dateFormat = "YYYY-MM-DD"
-
 var tikoBot = {
     prefix: "!",
     servers: []
@@ -27,6 +24,9 @@ client.on("message", msg => {
             case "!jaani":
             case "!help":
                 commands.cmd_help.execute(command, msg.channel)
+                break
+            case "!src":
+                commands.cmd_src.execute(command, msg.channel)
                 break
         }
     }

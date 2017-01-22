@@ -5,7 +5,14 @@ var rp = require('request-promise')
 
 const cmd_help = {
     execute: (command, channel) => {
-        var msgToSend = "Käytössä olevat komennot: \n !wire \n !louhi \n !help"
+        var msgToSend = "Käytössä olevat komennot: \n !wire \n !louhi \n !help \n !src"
+        channel.sendMessage(msgToSend)
+    }
+}
+
+const cmd_src = {
+    execute: (command, channel) => {
+        var msgToSend = "https://github.com/jaaniles/tikobot"
         channel.sendMessage(msgToSend)
     }
 }
@@ -75,3 +82,4 @@ const cmd_louhi = {
 exports.cmd_wire = cmd_wire
 exports.cmd_louhi = cmd_louhi
 exports.cmd_help = cmd_help
+exports.cmd_src = cmd_src
