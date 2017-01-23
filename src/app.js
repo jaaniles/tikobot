@@ -1,10 +1,10 @@
-var Discord = require("discord.js");
-var client = new Discord.Client();
-var axios = require('axios')
-var moment = require('moment')
+const Discord = require("discord.js");
+const client = new Discord.Client();
+const axios = require('axios')
+const moment = require('moment')
 
-var cfg      = require('./cfg.js')
-var commands = require('./commands.js')
+const cfg      = require('./cfg.js')
+const commands = require('./commands.js')
 
 const tikoBot = {
     prefix: "!",
@@ -14,7 +14,10 @@ client.on("message", msg => {
     let command = isCommand(msg)
     if (command) {
         commands.cmd_list.find(cmd => {
-            if (cmd.cmd === command[0]) {cmd.execute(command, msg.channel)}
+            if (cmd.cmd === command[0]) {
+                cmd.execute(command, msg.channel)
+                return
+            }
         })
     }
 });

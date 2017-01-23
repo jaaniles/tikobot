@@ -1,11 +1,20 @@
-var moment = require('moment')
-var axios = require('axios')
-var cheerio = require('cheerio')
-var rp = require('request-promise')
-var app = require('./app.js')
-
+const moment = require('moment')
+const axios = require('axios')
+const cheerio = require('cheerio')
+const rp = require('request-promise')
+const app = require('./app.js')
+const Discord = require("discord.js");
 
 const cmd_list = [
+    {
+        cmd: "invite",
+        help: "Luo kertakutsulinkin",
+        execute: function(command, channel){
+            let invite = new Discord.Invite()
+            console.log(invite)
+
+        }
+    },
     {
         cmd: "help",
         help: "Listaa botin komennot",
@@ -57,9 +66,12 @@ const cmd_list = [
                     } 
                 })
                 parsedMenu.forEach(dayMenu => {
-                    msgToSend += `\n-----${dayMenu.day}-----\n`
+                    // Don't include saturdays / sundays (no service then)
+                    if (!dayMenu.day.includes("Lauantai") && !dayMenu.day.includes("Sunnuntai")){
+                        msgToSend += `\n-----${dayMenu.day}-----\n`
+                    }
                     dayMenu.menu.forEach(mealType => {
-                        let mType = mealType.Name.toLowerCase()
+                        const mType = mealType.Name.toLowerCase()
                         if (mType === cmdMealType || mType.includes(cmdMealType)){
                             mealType.Meals.forEach(meal => {
                                 msgToSend += `\n- ${meal.Name} \n`
