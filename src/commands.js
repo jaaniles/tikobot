@@ -20,7 +20,7 @@ const cmd_list = [
         cmd: "help",
         help: "Listaa botin komennot",
         execute: (command, channel) => {
-            let msgToSend = "Käytössä olevat komennot:\n"
+            let msgToSend = "Käytössä olevat komennot:\n\n"
             cmd_list.map(command => {
                 msgToSend += `${app.tikoBot.prefix}${command.cmd} - ${command.help} \n`
             })
@@ -29,7 +29,7 @@ const cmd_list = [
     },
     {
         cmd: "src",
-        help: "Tikobotin lähdekoodi",
+        help: "Lähdekoodi",
         execute: (command, channel) => {
             let msgToSend = "https://github.com/jaaniles/tikobot"
             channel.sendMessage(msgToSend)
@@ -37,7 +37,7 @@ const cmd_list = [
     },
     {
         cmd: "wire",
-        help: "ex. !wire kotiruoka || kasvislounas || kevytkeittolounas || erikoisannos || jälkiruoka",
+        help: "Wireen ruokalistat. Käyttö: !wire kotiruoka || kasvislounas || kevytkeittolounas || erikoisannos || jälkiruoka :::: Protip: toimii myös esim. !wire koti",
         menuUrl: "http://www.amica.fi/api/restaurant/menu/week?language=fi&restaurantPageId=7925&weekDate=",
         dateFormat: "YYYY-MM-DD",
         cache: {
@@ -45,7 +45,7 @@ const cmd_list = [
             expires: null
         },
         execute: function (command, channel) {
-            let now = Math.floor(Date.now() / 1000)
+            const now = Math.floor(Date.now() / 1000)
             // No second parameter in command, help user 
             if (!command[1]){ 
                 channel.sendMessage(this.help) 
@@ -104,15 +104,36 @@ const cmd_list = [
         cmd: "louhi",
         help: "Louhen ruokalista",
         menuUrl: "http://mehtimakiravintolat.fi/ravintola-louhi/",
+        cache: {
+            content: [],
+            expires: null
+        },
         execute: function(command, channel){
-            let msgToSend = ""
+            const now = Math.floor(Date.now() / 1000)
+            if (now < this.cache.expires){
+                this.cache.content.map(c => {
+                    channel.sendMessage(c)
+                })
+                return
+            }
+            var msgToSend = ""
             rp(this.menuUrl).then(htmlString => {
                 let $ = cheerio.load(htmlString)
                 $("#content p, #content strong").each((i, el) => {
                     let txt = el.children[0].data
-                    if (txt){ msgToSend += `${txt}\n`}
+                    // Make sure message doesn't get too long
+                    if (txt && (msgToSend.length + txt.length) > 1800){
+                        this.cache.content.push(msgToSend)
+                        channel.sendMessage(msgToSend)
+                        msgToSend = ""
+                    }
+                    if (txt){ 
+                        msgToSend += `${txt}\n`
+                    }
                 })
-                channel.sendMessage(msgToSend)
+                this.cache.content.push(msgToSend)
+                this.cache.expires = Math.floor(Date.now() / 1000) + 86400
+                channel.sendMessage(msgToSend).catch(e => { console.log (e)})
             })
         }
     }
