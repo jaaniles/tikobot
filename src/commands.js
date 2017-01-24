@@ -10,9 +10,10 @@ const cmd_list = [
         cmd: "invite",
         help: "Luo kertakutsulinkin",
         execute: function(command, channel){
+            /*
             let invite = new Discord.Invite()
             console.log(invite)
-
+            */
         }
     },
     {
@@ -39,48 +40,64 @@ const cmd_list = [
         help: "ex. !wire kotiruoka || kasvislounas || kevytkeittolounas || erikoisannos || jälkiruoka",
         menuUrl: "http://www.amica.fi/api/restaurant/menu/week?language=fi&restaurantPageId=7925&weekDate=",
         dateFormat: "YYYY-MM-DD",
+        cache: {
+            content: null,
+            expires: null
+        },
         execute: function (command, channel) {
+            let now = Math.floor(Date.now() / 1000)
+            // No second parameter in command, help user 
             if (!command[1]){ 
                 channel.sendMessage(this.help) 
                 return
             }
-            let msgToSend = "";
+            if (now < this.cache.expires){
+                this.parseMenu(this.cache.content, command, channel)
+                return
+            }
+
             let date;
             let dayName = moment().format("dddd")
-            let cmdMealType = command[1].toLowerCase()
 
             /* If saturday / sunday, get next week */
             if (dayName === "Saturday" || dayName === "Sunday"){ 
                 date = moment().add(1, 'weeks').startOf('isoWeek').format(this.dateFormat)
             }
             else { date = moment().format(this.dateFormat) }
-
+            
             const menuUrl = `${this.menuUrl}${date}`
             axios.get(menuUrl)
             .then(response => {
                 const menu = response.data
-                const parsedMenu = menu.LunchMenus.map(item => {
-                    return {
-                        day: `${item.DayOfWeek} ${item.Date}`,
-                        menu: item.SetMenus
-                    } 
-                })
-                parsedMenu.forEach(dayMenu => {
-                    // Don't include saturdays / sundays (no service then)
-                    if (!dayMenu.day.includes("Lauantai") && !dayMenu.day.includes("Sunnuntai")){
-                        msgToSend += `\n-----${dayMenu.day}-----\n`
-                    }
-                    dayMenu.menu.forEach(mealType => {
-                        const mType = mealType.Name.toLowerCase()
-                        if (mType === cmdMealType || mType.includes(cmdMealType)){
-                            mealType.Meals.forEach(meal => {
-                                msgToSend += `\n- ${meal.Name} \n`
-                            })
-                        }
-                    })
-                })
-                channel.sendMessage(msgToSend)
+                this.cache.content = menu
+                this.cache.expires = Math.floor(Date.now() / 1000) + 86400
+                this.parseMenu(menu, command, channel)
             })
+        },
+        parseMenu: (menu, command, channel) => {
+            let msgToSend = "";
+            let cmdMealType = command[1].toLowerCase()
+            const parsedMenu = menu.LunchMenus.map(item => {
+                return {
+                    day: `${item.DayOfWeek} ${item.Date}`,
+                    menu: item.SetMenus
+                } 
+            })
+            parsedMenu.map(dayMenu => {
+                // Don't include saturdays / sundays (no service then)
+                if (!dayMenu.day.includes("Lauantai") && !dayMenu.day.includes("Sunnuntai")){
+                    msgToSend += `\n-----${dayMenu.day}-----\n`
+                }
+                dayMenu.menu.forEach(mealType => {
+                    const mType = mealType.Name.toLowerCase()
+                    if (mType === cmdMealType || mType.includes(cmdMealType)){
+                        mealType.Meals.forEach(meal => {
+                            msgToSend += `\n- ${meal.Name} \n`
+                        })
+                    }
+                })
+            })
+            channel.sendMessage(msgToSend)
         }
     },
     {

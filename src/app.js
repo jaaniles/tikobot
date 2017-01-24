@@ -8,6 +8,7 @@ const commands = require('./commands.js')
 
 const tikoBot = {
     prefix: "!",
+    
 }
 
 client.on("message", msg => {
