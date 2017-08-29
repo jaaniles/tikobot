@@ -7,16 +7,6 @@ const Discord = require("discord.js");
 
 const cmd_list = [
     {
-        cmd: "invite",
-        help: "Luo kertakutsulinkin",
-        execute: function(command, channel){
-            /*
-            let invite = new Discord.Invite()
-            console.log(invite)
-            */
-        }
-    },
-    {
         cmd: "help",
         help: "Listaa botin komennot",
         execute: (command, channel) => {
@@ -31,7 +21,7 @@ const cmd_list = [
         cmd: "src",
         help: "Lähdekoodi",
         execute: (command, channel) => {
-            let msgToSend = "https://github.com/jaaniles/tikobot"
+            const msgToSend = "https://github.com/jaaniles/tikobot"
             channel.sendMessage(msgToSend)
         }
     },
@@ -51,6 +41,7 @@ const cmd_list = [
                 channel.sendMessage(this.help) 
                 return
             }
+            // Use caché instead
             if (now < this.cache.expires){
                 this.parseMenu(this.cache.content, command, channel)
                 return
@@ -76,7 +67,7 @@ const cmd_list = [
         },
         parseMenu: (menu, command, channel) => {
             let msgToSend = "";
-            let cmdMealType = command[1].toLowerCase()
+            const cmdMealType = command[1].toLowerCase()
             const parsedMenu = menu.LunchMenus.map(item => {
                 return {
                     day: `${item.DayOfWeek} ${item.Date}`,
@@ -118,9 +109,9 @@ const cmd_list = [
             }
             var msgToSend = ""
             rp(this.menuUrl).then(htmlString => {
-                let $ = cheerio.load(htmlString)
+                const $ = cheerio.load(htmlString)
                 $("#content p, #content strong").each((i, el) => {
-                    let txt = el.children[0].data
+                    const txt = el.children[0].data
                     // Make sure message doesn't get too long
                     if (txt && (msgToSend.length + txt.length) > 1800){
                         this.cache.content.push(msgToSend)

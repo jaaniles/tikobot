@@ -12,7 +12,7 @@ const tikoBot = {
 }
 
 client.on("message", msg => {
-    let command = isCommand(msg)
+    const command = isCommand(msg)
     if (command) {
         commands.cmd_list.find(cmd => {
             if (cmd.cmd === command[0]) {
