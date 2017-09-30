@@ -57,7 +57,6 @@ const cmd_list = [
     help:
       "Käyttö: !me etunimi sukunimi aloitusvuosi. ex. !me Testi Testaaja 2016",
     isValidCommand: params => {
-      console.log("isvalidcommand", params);
       if (params.length !== 4) {
         return false;
       }
@@ -71,8 +70,6 @@ const cmd_list = [
       if (!firstName || !lastName || !year) {
         return false;
       }
-
-      console.log(firstName, lastName, year);
 
       return true;
     },
