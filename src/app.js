@@ -15,7 +15,7 @@ client.on("message", msg => {
     const command = isCommand(msg)
     if (command) {
         commands.cmd_list.find(cmd => {
-            if (cmd.cmd === command[0]) {
+            if (cmd.cmd === command.params[0]) {
                 cmd.execute(command, msg.channel)
                 return
             }
@@ -24,7 +24,7 @@ client.on("message", msg => {
 });
 
 client.on('ready', () => {
-  console.log('Ready for fun!');
+    console.log('Ready for fun!');
 });
 
 client.on("disconnected", () => {
@@ -34,7 +34,14 @@ client.on("disconnected", () => {
 /* Validates commands + returns it splitted without prefix*/ 
 function isCommand(msg){
     if (msg.author.bot) return
-    return msg.content.startsWith(tikoBot.prefix) ? (msg.content).substring(1).split(" ") : null
+    if (!msg.content.startsWith(tikoBot.prefix)) {
+        return null
+    }
+
+    return {
+        author: msg.author.username,
+        params: msg.content.substring(1).split(" ")
+    }
 }
 
 client.login(cfg.botToken);
