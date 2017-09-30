@@ -31,33 +31,74 @@ const cmd_list = [
   },
   {
     cmd: "whois",
-    help: "Kertoo kuka kukin on",
+    help:
+      "Kertoo kuka kukin on. Käyttö: !whois nick|etunimi|sukunimi. ex. !whois Pekka, !whois darkAngel92",
     execute: (command, channel) => {
-      const params = [command.params[1], command.params[1], command.params[1]] // command[1] has the nick we are searching for
-      const sql = "SELECT * FROM people WHERE nick = ? or firstName = ? or lastname = ?";
+      const params = [command.params[1], command.params[1], command.params[1]]; // command[1] has the nick we are searching for
+      const sql =
+        "SELECT * FROM people WHERE nick = ? or firstName = ? or lastName = ?";
       connection.query(sql, params, (err, result) => {
         if (err) throw err;
 
         if (result.length <= 0) {
-          channel.sendMessage("could not find");
+          channel.sendMessage("Tuon nimistä nyyberiä ei löytynyt");
         }
 
         result.map(res => {
-          channel.sendMessage(`${res.nick}: ${res.firstName} ${res.lastName} - ${res.year}`);
+          channel.sendMessage(
+            `${res.nick}: ${res.firstName} ${res.lastName} - ${res.year}`
+          );
         });
       });
     }
   },
   {
     cmd: "me",
-    help: "Luo sinusta entryn whois-kantaan",
-    execute: (command, channel) => {
-      const params = [command.author, command.params[1], command.params[2], command.params[3]]
-      const sql = "INSERT INTO people (nick, firstName, lastName, year) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE firstName = VALUES(firstName), lastName = VALUES(lastName), year = VALUES(year)"
+    help:
+      "Käyttö: !me etunimi sukunimi aloitusvuosi. ex. !me Testi Testaaja 2016",
+    isValidCommand: params => {
+      console.log("isvalidcommand", params);
+      if (params.length !== 4) {
+        return false;
+      }
+      const firstName = params[1];
+      const lastName = params[2];
+      const year = parseInt(params[3]);
+
+      if (typeof year !== "number") {
+        return false;
+      }
+      if (!firstName || !lastName || !year) {
+        return false;
+      }
+
+      console.log(firstName, lastName, year);
+
+      return true;
+    },
+    execute: function(command, channel) {
+      if (!this.isValidCommand(command.params)) {
+        channel.sendMessage(this.help);
+        return;
+      }
+
+      if (command.params.length <= 1) {
+        channel.sendMessage(this.help);
+        return;
+      }
+
+      const params = [
+        command.author,
+        command.params[1],
+        command.params[2],
+        command.params[3]
+      ];
+      const sql =
+        "INSERT INTO people (nick, firstName, lastName, year) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE firstName = VALUES(firstName), lastName = VALUES(lastName), year = VALUES(year)";
       connection.query(sql, params, (err, result) => {
         if (err) throw err;
-        console.log(result)
-      })
+        channel.sendMessage("Lisätty.");
+      });
     }
   },
   {
