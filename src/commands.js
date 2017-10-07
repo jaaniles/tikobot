@@ -90,6 +90,7 @@ const cmd_list = [
         command.params[2],
         command.params[3]
       ];
+      
       const sql =
         "INSERT INTO people (nick, firstName, lastName, year) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE firstName = VALUES(firstName), lastName = VALUES(lastName), year = VALUES(year)";
       connection.query(sql, params, (err, result) => {
