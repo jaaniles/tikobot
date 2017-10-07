@@ -5,12 +5,9 @@ const rp = require("request-promise");
 const Discord = require("discord.js");
 const mysql = require("mysql");
 const app = require("./app.js");
+const cfg = require('./cfg.js')
 
-const connection = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  database: "tikobot"
-});
+const connection = mysql.createConnection(cfg.database);
 
 connection.connect(err => {
   if (err) throw err;
