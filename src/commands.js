@@ -27,6 +27,30 @@ const cmd_list = [
     }
   },
   {
+    cmd: "role",
+    help: "Antaa roolin. Käyttö: !role PUBG",
+    execute: (command, channel) => {
+      const allowedRoles = ["pubg"]
+      const roleToAdd = command.params[1]
+
+      if (!roleToAdd || allowedRoles.indexOf(roleToAdd) === -1) {
+        channel.sendMessage(`Käyttö: !role PUBG. Sallitut roolit: PUBG`);
+        return
+      }
+
+      const role = command.guild.roles.find(role => role.name.toLowerCase() === roleToAdd.toLowerCase())
+     
+      const roles = command.member.roles.map(role => role.id)
+      if (roles.indexOf(role.id) === -1) {
+        command.member.addRole(role.id)
+        channel.sendMessage(`Rooli ${roleToAdd} annettu käyttäjälle ${command.author}`)
+      } else {
+        command.member.removeRole(role.id)
+        channel.sendMessage(`Rooli ${roleToAdd} poistettu käyttäjältä ${command.author}`)
+      }
+    }
+  },
+  {
     cmd: "whois",
     help:
       "Kertoo kuka kukin on. Käyttö: !whois nick|etunimi|sukunimi. ex. !whois Pekka, !whois darkAngel92",

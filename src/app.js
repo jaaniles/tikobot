@@ -40,6 +40,8 @@ function isCommand(msg){
 
     return {
         author: msg.author.username,
+        member: msg.member,
+        guild: msg.guild,
         params: msg.content.substring(1).split(" ")
     }
 }
