@@ -28,13 +28,13 @@ const cmd_list = [
   },
   {
     cmd: "role",
-    help: "Antaa roolin. Käyttö: !role PUBG",
+    help: "Käyttö: !role [PUBG]. Sallitut roolit: PUBG, CSGO, Overwatch",
     execute: (command, channel) => {
-      const allowedRoles = ["pubg"]
+      const allowedRoles = ["pubg", "csgo", "overwatch"]
       const roleToAdd = command.params[1]
 
-      if (!roleToAdd || allowedRoles.indexOf(roleToAdd) === -1) {
-        channel.sendMessage(`Käyttö: !role PUBG. Sallitut roolit: PUBG`);
+      if (!roleToAdd.toLowerCase() || allowedRoles.indexOf(roleToAdd.toLowerCase()) === -1) {
+        channel.sendMessage(`Käyttö: !role [PUBG]. Sallitut roolit: PUBG, CSGO, Overwatch`);
         return
       }
 
